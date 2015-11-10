@@ -29,54 +29,35 @@ public extension UIViewController {
 public class FakeWindow: UIWindow {
 
     public var contentVC: UIViewController
-    public var viewVC: UIView?
-    
     private var _actorVC: UIViewController? = nil
-    public override var rootViewController: UIViewController? {
-        get { return _actorVC }
-        set { changeVC(newValue)
-        }
-    }
 
     required public init(vc:UIViewController) {
         self.contentVC = vc
         super.init(frame: CGRectZero)
     }
 
-
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func changeVC(vc: UIViewController?)
-    {
-        if (self._actorVC != nil && vc != nil && vc == self._actorVC) {
-            return;
-        }
-        
-        if (viewVC == nil)
-        {
-            let rect: CGRect = self.contentVC.view.bounds
-            viewVC = UIView.init(frame: CGRectMake(0, 0, rect.size.width, rect.size.height-48))
-            viewVC?.backgroundColor = UIColor.redColor()
-            viewVC!.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
-            self.contentVC.view.addSubview(viewVC!)
-        }
-        if (self._actorVC != nil)
-        {
-            self._actorVC!.view.removeFromSuperview()
-            self._actorVC!.removeFromParentViewController()
-            self._actorVC = nil;
-        }
-        self._actorVC = vc;
-        
-        if (vc != nil)
-        {
-            self.contentVC.addChildViewController(vc!)
-            self.viewVC!.addSubview(vc!.view)
-            vc!.view.frame = self.viewVC!.bounds
-            vc!.view.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
+    // !!!!!!!!!!!
+    public override var rootViewController: UIViewController? {
+        get { return _actorVC }
+        set {
+            if (self._actorVC != nil) {
+                self._actorVC!.view.removeFromSuperview()
+                self._actorVC!.removeFromParentViewController()
+                self._actorVC = nil;
+            }
+            
+            self._actorVC = newValue;
+            
+            if (self._actorVC != nil) {
+                self.contentVC.addChildViewController(self._actorVC!)
+                self.contentVC.view.addSubview(self._actorVC!.view)
+                self._actorVC!.view.frame = CGRectMake(0, 0, self.contentVC.view.bounds.size.width, self.contentVC.view.bounds.size.height-48)
+                self._actorVC!.view.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
+            }
         }
     }
-
 }
